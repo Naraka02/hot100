@@ -133,109 +133,6 @@ const topicMap = {
   "04 Greedy To Tricks": ["贪心", "动态规划", "技巧题", "字符串", "数学"],
 };
 
-const complexityMap = {
-  1: { time: "O(n)", space: "O(n)" },
-  2: { time: "O(n * k log k)", space: "O(nk)" },
-  3: { time: "O(n)", space: "O(n)" },
-  4: { time: "O(n)", space: "O(1)" },
-  5: { time: "O(n)", space: "O(1)" },
-  6: { time: "O(n^2)", space: "O(log n)" },
-  7: { time: "O(n)", space: "O(1)" },
-  8: { time: "O(n)", space: "O(min(n, Sigma))" },
-  9: { time: "O(n)", space: "O(1)" },
-  10: { time: "O(n)", space: "O(n)" },
-  11: { time: "O(n)", space: "O(k)" },
-  12: { time: "O(m + n)", space: "O(Sigma)" },
-  13: { time: "O(n)", space: "O(1)" },
-  14: { time: "O(n log n)", space: "O(log n)" },
-  15: { time: "O(n)", space: "O(1)" },
-  16: { time: "O(n)", space: "O(1)" },
-  17: { time: "O(n)", space: "O(1)" },
-  18: { time: "O(mn)", space: "O(1)" },
-  19: { time: "O(mn)", space: "O(1)" },
-  20: { time: "O(n^2)", space: "O(1)" },
-  21: { time: "O(m + n)", space: "O(1)" },
-  22: { time: "O(m + n)", space: "O(1)" },
-  23: { time: "O(n)", space: "O(1)" },
-  24: { time: "O(n)", space: "O(1)" },
-  25: { time: "O(n)", space: "O(1)" },
-  26: { time: "O(n)", space: "O(1)" },
-  27: { time: "O(m + n)", space: "O(1)" },
-  28: { time: "O(max(m, n))", space: "O(max(m, n))" },
-  29: { time: "O(n)", space: "O(1)" },
-  30: { time: "O(n)", space: "O(1)" },
-  31: { time: "O(n)", space: "O(1)" },
-  32: { time: "O(n)", space: "O(n)" },
-  33: { time: "O(n log n)", space: "O(log n)" },
-  34: { time: "O(N log k)", space: "O(k)" },
-  35: { time: "O(1)", space: "O(capacity)" },
-  36: { time: "O(n)", space: "O(n)" },
-  37: { time: "O(n)", space: "O(h)" },
-  38: { time: "O(n)", space: "O(h)" },
-  39: { time: "O(n)", space: "O(h)" },
-  40: { time: "O(n)", space: "O(h)" },
-  41: { time: "O(n)", space: "O(n)" },
-  42: { time: "O(n log n)", space: "O(n log n)" },
-  43: { time: "O(n)", space: "O(h)" },
-  44: { time: "O(h + k)", space: "O(h)" },
-  45: { time: "O(n)", space: "O(n)" },
-  46: { time: "O(n^2)", space: "O(h)" },
-  47: { time: "O(n)", space: "O(n)" },
-  48: { time: "O(n)", space: "O(h)" },
-  49: { time: "O(n)", space: "O(h)" },
-  50: { time: "O(n)", space: "O(h)" },
-  51: { time: "O(mn)", space: "O(mn)" },
-  52: { time: "O(mn)", space: "O(mn)" },
-  53: { time: "O(V + E)", space: "O(V + E)" },
-  54: { time: "insert/search O(L)", space: "O(total chars)" },
-  55: { time: "O(n * n!)", space: "O(n)" },
-  56: { time: "O(n * 2^n)", space: "O(n)" },
-  57: { time: "O(4^n * n)", space: "O(n)" },
-  58: { time: "O(#ans * avg_len)", space: "O(target)" },
-  59: { time: "O(Cn * n)", space: "O(n)" },
-  60: { time: "O(mn * 4^L)", space: "O(L)" },
-  61: { time: "O(n * 2^n)", space: "O(n)" },
-  62: { time: "O(n!)", space: "O(n)" },
-  63: { time: "O(log n)", space: "O(1)" },
-  64: { time: "O(log n)", space: "O(1)" },
-  65: { time: "O(log(mn))", space: "O(1)" },
-  66: { time: "O(log n)", space: "O(1)" },
-  67: { time: "O(log min(m, n))", space: "O(1)" },
-  68: { time: "O(n)", space: "O(n)" },
-  69: { time: "push/pop/top/getMin O(1)", space: "O(n)" },
-  70: { time: "O(n * k)", space: "O(n)" },
-  71: { time: "O(n)", space: "O(n)" },
-  72: { time: "O(n)", space: "O(n)" },
-  73: { time: "O(n log k)", space: "O(k)" },
-  74: { time: "O(n)", space: "O(n)" },
-  75: { time: "add O(log n), find O(1)", space: "O(n)" },
-  76: { time: "O(n)", space: "O(1)" },
-  77: { time: "O(n)", space: "O(1)" },
-  78: { time: "O(n)", space: "O(1)" },
-  79: { time: "O(n)", space: "O(1)" },
-  80: { time: "O(n)", space: "O(1)" },
-  81: { time: "O(n^2)", space: "O(1) extra" },
-  82: { time: "O(n)", space: "O(1)" },
-  83: { time: "O(n * sqrt(n))", space: "O(n)" },
-  84: { time: "O(amount * len(coins))", space: "O(amount)" },
-  85: { time: "O(n^3)", space: "O(n)" },
-  86: { time: "O(n log n)", space: "O(n)" },
-  87: { time: "O(n)", space: "O(1)" },
-  88: { time: "O(n * sum)", space: "O(sum)" },
-  89: { time: "O(n)", space: "O(n)" },
-  90: { time: "O(mn)", space: "O(n)" },
-  91: { time: "O(mn)", space: "O(n)" },
-  92: { time: "O(n^2)", space: "O(1)" },
-  93: { time: "O(mn)", space: "O(n)" },
-  94: { time: "O(mn)", space: "O(n)" },
-  95: { time: "O(n)", space: "O(1)" },
-  96: { time: "O(n)", space: "O(1)" },
-  97: { time: "O(n)", space: "O(1)" },
-  98: { time: "O(n)", space: "O(1)" },
-  99: { time: "O(n)", space: "O(1)" },
-  100: { time: "O(mn)", space: "O(n)" },
-};
-
 let sectionObserver = null;
 
 init().catch((error) => {
@@ -312,25 +209,6 @@ function bindEvents() {
       return;
     }
 
-    const linkButton = event.target.closest(".copy-link-btn");
-    if (linkButton) {
-      try {
-        const id = linkButton.dataset.id;
-        const url = new URL(`#${id}`, location.href).href;
-        await navigator.clipboard.writeText(url);
-        linkButton.textContent = "链接已复制";
-        setTimeout(() => {
-          linkButton.textContent = "复制题号链接";
-        }, 1200);
-      } catch {
-        linkButton.textContent = "复制失败";
-        setTimeout(() => {
-          linkButton.textContent = "复制题号链接";
-        }, 1200);
-      }
-      return;
-    }
-
     const filter = event.target.closest(".lang-filter-btn");
     if (filter) {
       state.langFilter = filter.dataset.filter;
@@ -374,7 +252,6 @@ function parseGroup(file) {
       brief: briefMap[number] || `浏览 ${name} 的简要题意与极简题解。`,
       difficulty: getDifficulty(number),
       tags: getTags(title, name),
-      complexity: complexityMap[number] || { time: "-", space: "-" },
       leetcodeUrl: `https://leetcode.cn/problemset/all/?search=${encodeURIComponent(name)}`,
       ...parsed,
     };
@@ -528,10 +405,7 @@ function renderContent() {
                 ${item.tags.map((tag) => `<span class="pill">${escapeHtml(tag)}</span>`).join("")}
               </div>
             </div>
-            <div class="anchor-actions">
-              <a class="anchor-link" href="#${encodeURIComponent(item.id)}">#${item.number}</a>
-              <button class="copy-link-btn" type="button" data-id="${escapeHtml(item.id)}">复制题号链接</button>
-            </div>
+            <a class="anchor-link" href="#${encodeURIComponent(item.id)}">#${item.number}</a>
           </div>
 
           <div class="summary-grid">
@@ -546,11 +420,6 @@ function renderContent() {
             <section class="info-box">
               <p class="box-title">题目入口</p>
               <p><a href="${item.leetcodeUrl}" target="_blank" rel="noreferrer">在 LeetCode 中搜索这题</a></p>
-            </section>
-            <section class="info-box">
-              <p class="box-title">复杂度</p>
-              <p><strong>时间：</strong>${escapeHtml(item.complexity.time)}</p>
-              <p><strong>空间：</strong>${escapeHtml(item.complexity.space)}</p>
             </section>
           </div>
 
