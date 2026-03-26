@@ -275,6 +275,13 @@ button {
   align-items: start;
 }
 
+.anchor-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
 .section-card h3 {
   margin: 0 0 8px;
   font-size: 2rem;
@@ -317,6 +324,12 @@ button {
   color: var(--muted);
   text-decoration: none;
   font-family: "IBM Plex Sans", "PingFang SC", sans-serif;
+}
+
+.copy-link-btn {
+  background: rgba(255, 255, 255, 0.68);
+  font-size: 0.82rem;
+  white-space: nowrap;
 }
 
 .summary-grid,
@@ -624,6 +637,10 @@ pre code {
   .summary-grid,
   .code-grid {
     grid-template-columns: 1fr;
+  }
+
+  .anchor-actions {
+    align-items: flex-start;
   }
 
   .section-card {
