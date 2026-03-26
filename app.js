@@ -114,6 +114,8 @@ const state = {
   expanded: true,
   activeId: null,
   langFilter: "both",
+  visibleProblems: [],
+  preferredTab: "python",
 };
 
 const nav = document.getElementById("nav");
@@ -122,6 +124,16 @@ const searchInput = document.getElementById("searchInput");
 const countText = document.getElementById("countText");
 const heroText = document.getElementById("heroText");
 const toggleAllBtn = document.getElementById("toggleAllBtn");
+const backToTopBtn = document.getElementById("backToTopBtn");
+
+const topicMap = {
+  "01 Hash To Matrix": ["数组", "哈希", "双指针", "滑动窗口", "矩阵"],
+  "02 Linked List To Graph": ["链表", "二叉树", "图论", "BFS/DFS", "设计"],
+  "03 Backtracking To Heap": ["回溯", "二分", "栈", "堆", "搜索"],
+  "04 Greedy To Tricks": ["贪心", "动态规划", "技巧题", "字符串", "数学"],
+};
+
+let sectionObserver = null;
 
 init().catch((error) => {
   content.innerHTML = `<div class="loading">加载失败：${escapeHtml(String(error))}<br>请用本地 HTTP 服务打开此页面，例如 <code>python3 -m http.server</code>。</div>`;
@@ -140,6 +152,9 @@ async function init() {
 
   state.groups = texts.map(parseGroup);
   state.problems = state.groups.flatMap((group) => group.items);
+  state.visibleProblems = state.problems;
+  state.langFilter = localStorage.getItem("hot100-lang-filter") || "both";
+  state.preferredTab = localStorage.getItem("hot100-preferred-tab") || "python";
   state.activeId = state.problems[0]?.id ?? null;
 
   const hash = decodeURIComponent(location.hash.slice(1));
@@ -148,6 +163,7 @@ async function init() {
   heroText.textContent = `共 ${state.problems.length} 题，新增简要题面摘要，并优化了代码卡片、语言标签和复制操作。`;
   bindEvents();
   render();
+  observeSections();
 
   if (state.activeId) {
     const node = document.getElementById(state.activeId);
@@ -161,12 +177,18 @@ function bindEvents() {
     state.expanded = !state.expanded;
     renderNav();
   });
+  backToTopBtn.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
   window.addEventListener("hashchange", () => {
     const id = decodeURIComponent(location.hash.slice(1));
     if (state.problems.some((item) => item.id === id)) {
       state.activeId = id;
       setActiveLink();
     }
+  });
+  window.addEventListener("scroll", () => {
+    backToTopBtn.classList.toggle("visible", window.scrollY > 480);
   });
   document.addEventListener("click", async (event) => {
     const button = event.target.closest(".copy-btn");
@@ -190,12 +212,16 @@ function bindEvents() {
     const filter = event.target.closest(".lang-filter-btn");
     if (filter) {
       state.langFilter = filter.dataset.filter;
+      localStorage.setItem("hot100-lang-filter", state.langFilter);
       renderContent();
+      observeSections();
       return;
     }
 
     const tab = event.target.closest(".code-tab");
     if (tab) {
+      state.preferredTab = tab.dataset.lang;
+      localStorage.setItem("hot100-preferred-tab", state.preferredTab);
       const wrap = tab.closest(".code-switcher");
       wrap?.querySelectorAll(".code-tab").forEach((node) => {
         node.classList.toggle("active", node === tab);
@@ -224,6 +250,9 @@ function parseGroup(file) {
       name,
       group: title,
       brief: briefMap[number] || `浏览 ${name} 的简要题意与极简题解。`,
+      difficulty: getDifficulty(number),
+      tags: getTags(title, name),
+      leetcodeUrl: `https://leetcode.cn/problemset/all/?search=${encodeURIComponent(name)}`,
       ...parsed,
     };
   });
@@ -276,22 +305,24 @@ function parseProblemBody(markdown) {
 }
 
 function render() {
+  state.visibleProblems = getVisibleProblems();
+  if (!state.visibleProblems.some((item) => item.id === state.activeId)) {
+    state.activeId = state.visibleProblems[0]?.id ?? null;
+  }
   renderNav();
   renderContent();
+  observeSections();
 }
 
 function renderNav() {
-  const keyword = searchInput.value.trim().toLowerCase();
   const groups = state.groups
     .map((group) => ({
       ...group,
-      items: group.items.filter((item) =>
-        `${item.number} ${item.name} ${item.group} ${item.brief} ${item.idea}`.toLowerCase().includes(keyword)
-      ),
+      items: group.items.filter((item) => state.visibleProblems.some((x) => x.id === item.id)),
     }))
     .filter((group) => group.items.length);
 
-  countText.textContent = keyword
+  countText.textContent = searchInput.value.trim()
     ? `匹配 ${groups.reduce((sum, group) => sum + group.items.length, 0)} 题`
     : `共 ${state.problems.length} 题`;
   toggleAllBtn.textContent = state.expanded ? "折叠全部分组" : "展开全部分组";
@@ -346,6 +377,7 @@ function renderContent() {
       <div>
         <p class="eyebrow">Code View</p>
         <h3 class="toolbar-title">代码显示</h3>
+        <p class="toolbar-note">当前显示 ${state.visibleProblems.length} / ${state.problems.length} 题</p>
       </div>
       <div class="lang-filter">
         ${renderLangFilterButton("both", "全部")}
@@ -355,14 +387,23 @@ function renderContent() {
     </section>
   `;
 
-  content.innerHTML = toolbar + state.problems
+  if (!state.visibleProblems.length) {
+    content.innerHTML = toolbar + `<section class="toolbar-card"><div><p class="eyebrow">No Result</p><h3 class="toolbar-title">没有匹配的题目</h3><p class="toolbar-note">换个关键词，或者清空搜索框重试。</p></div></section>`;
+    return;
+  }
+
+  content.innerHTML = toolbar + state.visibleProblems
     .map(
-      (item) => `
+      (item, index) => `
         <article class="section-card" id="${escapeHtml(item.id)}">
           <div class="problem-head">
             <div>
               <p class="eyebrow">${escapeHtml(item.group)}</p>
               <h3>${item.number}. ${escapeHtml(item.name)}</h3>
+              <div class="meta-row">
+                <span class="pill difficulty-${item.difficulty.toLowerCase()}">${escapeHtml(item.difficulty)}</span>
+                ${item.tags.map((tag) => `<span class="pill">${escapeHtml(tag)}</span>`).join("")}
+              </div>
             </div>
             <a class="anchor-link" href="#${encodeURIComponent(item.id)}">#${item.number}</a>
           </div>
@@ -376,11 +417,16 @@ function renderContent() {
               <p class="box-title">核心思路</p>
               <p>${escapeHtml(item.idea || "见下方代码。")}</p>
             </section>
+            <section class="info-box">
+              <p class="box-title">题目入口</p>
+              <p><a href="${item.leetcodeUrl}" target="_blank" rel="noreferrer">在 LeetCode 中搜索这题</a></p>
+            </section>
           </div>
 
           ${item.extraHtml ? `<div class="problem-extra">${item.extraHtml}</div>` : ""}
 
           ${renderCodeSection(item.codeBlocks)}
+          ${renderProblemNav(index)}
         </article>
       `
     )
@@ -404,20 +450,32 @@ function renderCodeSection(blocks) {
     return `<div class="code-grid single">${visible.map(renderCodeBlock).join("")}</div>`;
   }
 
-  const first = normalizeLangKey(visible[0].lang);
+  const preferred = visible.find((block) => normalizeLangKey(block.lang) === state.preferredTab);
+  const first = normalizeLangKey((preferred || visible[0]).lang);
   return `
     <section class="code-switcher">
       <div class="code-tabs">
-        ${visible.map((block, index) => {
+        ${visible.map((block) => {
           const key = normalizeLangKey(block.lang);
-          return `<button class="code-tab ${index === 0 ? "active" : ""}" type="button" data-lang="${key}">${escapeHtml(normalizeLang(block.lang))}</button>`;
+          return `<button class="code-tab ${key === first ? "active" : ""}" type="button" data-lang="${key}">${escapeHtml(normalizeLang(block.lang))}</button>`;
         }).join("")}
       </div>
-      ${visible.map((block, index) => {
+      ${visible.map((block) => {
         const key = normalizeLangKey(block.lang);
-        return `<div class="code-panel" data-lang="${key}" ${index === 0 ? "" : "hidden"}>${renderCodeBlock(block)}</div>`;
+        return `<div class="code-panel" data-lang="${key}" ${key === first ? "" : "hidden"}>${renderCodeBlock(block)}</div>`;
       }).join("")}
     </section>
+  `;
+}
+
+function renderProblemNav(index) {
+  const prev = state.visibleProblems[index - 1];
+  const next = state.visibleProblems[index + 1];
+  return `
+    <footer class="problem-nav">
+      ${prev ? `<a class="problem-nav-link" href="#${encodeURIComponent(prev.id)}">上一题：${prev.number}. ${escapeHtml(prev.name)}</a>` : `<span class="problem-nav-link ghost">已经是第一题</span>`}
+      ${next ? `<a class="problem-nav-link" href="#${encodeURIComponent(next.id)}">下一题：${next.number}. ${escapeHtml(next.name)}</a>` : `<span class="problem-nav-link ghost">已经是最后一题</span>`}
+    </footer>
   `;
 }
 
@@ -439,6 +497,47 @@ function setActiveLink() {
   document.querySelectorAll(".problem-link").forEach((link) => {
     link.classList.toggle("active", link.dataset.id === state.activeId);
   });
+}
+
+function getVisibleProblems() {
+  const keyword = searchInput.value.trim().toLowerCase();
+  if (!keyword) return state.problems;
+  return state.problems.filter((item) =>
+    `${item.number} ${item.name} ${item.group} ${item.brief} ${item.idea} ${item.tags.join(" ")} ${item.difficulty}`.toLowerCase().includes(keyword)
+  );
+}
+
+function observeSections() {
+  if (sectionObserver) sectionObserver.disconnect();
+  const articles = [...document.querySelectorAll(".section-card[id]")];
+  if (!articles.length) return;
+  sectionObserver = new IntersectionObserver(
+    (entries) => {
+      const visible = entries
+        .filter((entry) => entry.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (!visible) return;
+      state.activeId = visible.target.id;
+      setActiveLink();
+    },
+    { rootMargin: "-15% 0px -65% 0px", threshold: [0.1, 0.3, 0.6] }
+  );
+  articles.forEach((article) => sectionObserver.observe(article));
+}
+
+function getDifficulty(number) {
+  if ([1, 4, 8, 13, 15, 22, 23, 25, 27, 29, 36, 37, 38, 39, 41, 42, 45, 51, 53, 54, 56, 57, 68, 69, 71, 73, 74, 76, 77, 79, 80, 81, 82, 90, 95, 96].includes(number)) return "Easy";
+  if ([5, 9, 10, 11, 14, 16, 18, 19, 20, 21, 24, 26, 28, 30, 32, 33, 34, 40, 43, 44, 46, 47, 48, 49, 52, 55, 58, 59, 60, 61, 63, 64, 65, 66, 70, 72, 75, 78, 83, 84, 85, 86, 87, 88, 91, 92, 93, 94, 97, 98, 99, 100].includes(number)) return "Medium";
+  return "Hard";
+}
+
+function getTags(group, name) {
+  const base = topicMap[group] || ["题解"];
+  if (name.includes("链表")) return ["链表", ...base.slice(0, 2)];
+  if (name.includes("二叉树") || name.includes("BST")) return ["二叉树", ...base.slice(0, 2)];
+  if (name.includes("矩阵")) return ["矩阵", ...base.slice(0, 2)];
+  if (name.includes("子串") || name.includes("字符串")) return ["字符串", ...base.slice(0, 2)];
+  return base.slice(0, 3);
 }
 
 function renderMarkdown(markdown) {

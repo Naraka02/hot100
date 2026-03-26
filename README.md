@@ -21,4 +21,5 @@
 GitHub Pages：
 
 - 已包含工作流 [deploy-pages.yml](/home/naraka_02/codes/hot100/.github/workflows/deploy-pages.yml)
-- 推送到 GitHub 仓库的 `main` 分支后，可发布到 `https://<github-username>.github.io/hot100/`
+- 线上地址：`https://naraka02.github.io/hot100/`
+- 已补充 `404.html`、`robots.txt`、`sitemap.xml`

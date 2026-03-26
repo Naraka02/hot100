@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://naraka02.github.io/hot100/sitemap.xml

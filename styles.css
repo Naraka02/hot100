@@ -69,6 +69,7 @@ body {
 .meta,
 .group-label,
 .problem-link small,
+.toolbar-note,
 .note,
 li {
   font-family: "IBM Plex Sans", "PingFang SC", sans-serif;
@@ -244,6 +245,12 @@ button {
   font-size: 1.5rem;
 }
 
+.toolbar-note {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
 .lang-filter {
   display: flex;
   flex-wrap: wrap;
@@ -273,6 +280,38 @@ button {
   font-size: 2rem;
 }
 
+.meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(90, 71, 43, 0.08);
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-family: "IBM Plex Sans", "PingFang SC", sans-serif;
+}
+
+.difficulty-easy {
+  background: rgba(69, 131, 84, 0.14);
+  color: #2e6b3e;
+}
+
+.difficulty-medium {
+  background: rgba(199, 129, 48, 0.14);
+  color: #9c5e16;
+}
+
+.difficulty-hard {
+  background: rgba(186, 78, 78, 0.14);
+  color: #973838;
+}
+
 .anchor-link {
   flex: none;
   color: var(--muted);
@@ -287,7 +326,7 @@ button {
 }
 
 .summary-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin: 18px 0;
 }
 
@@ -391,6 +430,26 @@ button {
 
 .copy-btn:hover {
   background: rgba(255, 255, 255, 0.1);
+}
+
+.problem-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.problem-nav-link {
+  max-width: 48%;
+  text-decoration: none;
+  color: var(--accent);
+  font-family: "IBM Plex Sans", "PingFang SC", sans-serif;
+}
+
+.problem-nav-link.ghost {
+  color: var(--muted);
 }
 
 .section-card h4 {
@@ -516,6 +575,27 @@ pre code {
   color: var(--muted);
 }
 
+.back-to-top {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 20;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  background: var(--accent);
+  color: #fff7ef;
+  border-color: transparent;
+  box-shadow: var(--shadow);
+}
+
+.back-to-top.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
 @media (max-width: 960px) {
   .app {
     grid-template-columns: 1fr;
@@ -548,5 +628,13 @@ pre code {
 
   .section-card {
     padding: 20px;
+  }
+
+  .problem-nav {
+    flex-direction: column;
+  }
+
+  .problem-nav-link {
+    max-width: 100%;
   }
 }
